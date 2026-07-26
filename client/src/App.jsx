@@ -107,7 +107,7 @@ function App() {
     setActiveTab("output");
 
     try {
-      const res = await fetch("/api/compile", {
+      const res = await fetch("/compile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: codeRef.current, input: inputRef.current }),
