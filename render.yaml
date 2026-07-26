@@ -2,8 +2,7 @@ services:
   - type: web
     name: cpp-online-compiler
     runtime: node
-    buildCommand: cd client && npm install && npm run build && cd ../server && npm install
-    startCommand: cd server && node index.js
+    dockerfilePath: Dockerfile
     envVars:
       - key: NODE_ENV
         value: production

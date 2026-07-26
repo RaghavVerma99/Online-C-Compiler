@@ -36,8 +36,8 @@ A sleek, browser-based C++ compiler built with **React** and **Node.js**. Write,
 
 ```
 cpp-online-compiler/
-├── package.json          # Root scripts (build, start)
-├── render.yaml           # Render deployment config
+├── package.json          # Root — all deps + build/start scripts
+├── render.yaml           # Render Blueprint config
 ├── .gitignore
 │
 ├── client/               # React frontend
@@ -52,8 +52,7 @@ cpp-online-compiler/
 │
 └── server/               # Node.js backend
     ├── index.js          # Express server + compilation logic
-    ├── package.json
-    └── temp/             # Auto-cleaned temp compilation files
+    └── package.json      # Metadata only (deps live at root)
 ```
 
 ---
@@ -72,13 +71,9 @@ cpp-online-compiler/
 git clone https://github.com/your-username/cpp-online-compiler.git
 cd cpp-online-compiler
 
-# Install server dependencies
-cd server
+# Install all dependencies (root + client)
 npm install
-
-# Install client dependencies
-cd ../client
-npm install
+cd client && npm install && cd ..
 ```
 
 ### Running
@@ -87,14 +82,12 @@ Open two terminals:
 
 **Terminal 1 — Backend (port 5000):**
 ```bash
-cd server
-npm start
+npm run dev:server
 ```
 
 **Terminal 2 — Frontend (port 3000):**
 ```bash
-cd client
-npm run dev
+npm run dev:client
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -105,49 +98,30 @@ The Vite dev server proxies `/api/*` requests to the Express backend automatical
 
 ## Deployment on Render
 
-### Option A: Blueprint (render.yaml)
+This project includes a `Dockerfile` and `render.yaml` — both are configured for Render.
+
+### Option A: Blueprint (render.yaml) — Recommended
 
 1. Push this repo to GitHub
 2. Go to [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**
 3. Connect your GitHub repo
-4. Render reads `render.yaml` and provisions the service automatically
-5. Make sure your Render instance has **g++ installed** (add a build step or use a Docker image)
+4. Render reads `render.yaml`, builds the Docker image (which installs g++, deps, and builds the React client), and deploys automatically
 
-### Option B: Manual Web Service
+### Option B: Manual Web Service with Docker
 
 1. Create a new **Web Service** on Render
 2. Connect your GitHub repo
-3. Configure:
-   - **Build Command:**
-     ```
-     cd client && npm install && npm run build && cd ../server && npm install
-     ```
-   - **Start Command:**
-     ```
-     cd server && node index.js
-     ```
-   - **Environment:** `NODE_ENV` = `production`
+3. Set **Runtime** to `Docker`
+4. Leave the Dockerfile path as `Dockerfile` (root)
+5. Render will build the image and deploy
 
-### Important: g++ on Render
+### How the Dockerfile works
 
-Render's default Node.js environment does **not** include g++. You have two options:
-
-**Option 1 — Add a render.yaml install step (simplest):**
-Add this to your build command before the Node install:
 ```
-apt-get update && apt-get install -y g++ && cd client && npm install && npm run build && cd ../server && npm install
+node:18-slim  →  installs g++  →  npm install (root deps)  →  npm install (client deps)  →  builds React  →  runs server
 ```
 
-**Option 2 — Use a Dockerfile:**
-```dockerfile
-FROM node:18-slim
-RUN apt-get update && apt-get install -y g++ && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
-COPY . .
-RUN cd client && npm install && npm run build && cd ../server && npm install
-EXPOSE 5000
-CMD ["node", "server/index.js"]
-```
+g++ is installed inside the Docker image, so C++ compilation works at runtime on Render.
 
 ---
 
