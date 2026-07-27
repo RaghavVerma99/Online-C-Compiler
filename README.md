@@ -9,23 +9,27 @@
 
 ---
 
-## What is it?
+## What is CppLab?
 
-CppLab is a lightweight, browser-based C++ compiler. It takes your code, sends it to a Node.js backend where **g++ compiles and executes it**, and streams the result back — all in under a second. No installations. No IDE setup. Just code and run.
+CppLab is a lightweight, browser-based C++ compiler designed for students, developers, and anyone who wants to quickly write, compile, and run C++ code without installing any tools. Built with a modern glassmorphism UI, it provides a professional coding experience right in your browser. Simply write your C++ code, click Run, and see the output instantly — all compiled and executed server-side with g++.
 
 ---
 
-## Highlights
+## Features
 
 | | Feature | Detail |
 |---|---|---|
-| ⚡ | **Instant Compile** | C++17 code compiles and runs on the server with g++ |
-| 📥 | **Stdin Support** | Pass standard input for interactive programs |
-| 🔬 | **Live Errors** | Compilation and runtime errors shown with context |
-| ⏱ | **Execution Time** | See exactly how long your code took to run |
-| 🧪 | **4 Examples** | Hello World, Fibonacci, Bubble Sort, User Input — one click to load |
-| 🌙 | **Dark Glass UI** | Animated gradient glows, glassmorphism panels |
-| ⌨️ | **`Ctrl+Enter`** | Keyboard shortcut to compile instantly |
+| ⚡ | **Instant Compile** | C++17 code compiles and runs on the server with g++ in milliseconds |
+| 📥 | **Stdin Support** | Pass standard input for interactive programs (cin, getline, etc.) |
+| 🔬 | **Live Errors** | Compilation and runtime errors shown with full context and line numbers |
+| ⏱ | **Execution Time** | See exactly how long your code took to run with millisecond precision |
+| 🧪 | **4 Built-in Examples** | Hello World, Fibonacci, Bubble Sort, User Input — one click to load |
+| 🌙 | **Dark Glass UI** | Animated gradient glows, glassmorphism panels, and modern aesthetics |
+| ⌨️ | **Keyboard Shortcuts** | `Ctrl+Enter` to compile, `Shift+Alt+F` to format code |
+| 🎨 | **Code Formatting** | Built-in C++ formatter that auto-indents, spaces operators, and organizes braces |
+| 🔤 | **Classic Mac Typography** | Monaco/Menlo font stack for authentic retro coding feel |
+| 🔄 | **Smart Auto-Indent** | Pressing Enter automatically follows previous line indentation |
+| 📱 | **Responsive Design** | Works on both desktop and mobile screens |
 
 ---
 
@@ -44,13 +48,40 @@ CppLab is a lightweight, browser-based C++ compiler. It takes your code, sends i
                                    └──────────┘            │
 ```
 
-1. You write C++ in the editor and hit **Run**
+1. You write C++ in the editor and hit **Run** (or press `Ctrl+Enter`)
 2. Frontend sends `{ code, input }` to `POST /compile`
-3. Server writes code to a temp `.cpp` file
-4. `g++ -std=c++17` compiles it
-5. Binary executes with your stdin (if any)
-6. stdout/stderr + execution time returned
+3. Server writes code to a temp `.cpp` file with a unique UUID
+4. `g++ -std=c++17 -Wall -Wextra -O2` compiles it with full warnings
+5. Binary executes with your stdin (if any) — 10 second timeout
+6. stdout/stderr + execution time returned as JSON
 7. Temp files cleaned up automatically
+
+---
+
+## Code Editor Features
+
+### Smart Auto-Indentation
+
+When you press `Enter`, the editor automatically:
+- **Follows the previous line's indentation level**
+- **Adds an extra indent** when the previous line ends with `{`, `(`, or `[`
+- **Maintains clean structure** without manual spacing
+
+Example:
+```cpp
+if (condition) {     // You type this
+    // Pressing Enter automatically indents here
+}
+```
+
+### Code Formatter
+
+Click the **Format** button or press `Shift+Alt+F` to:
+- Normalize indentation to 4 spaces
+- Fix spacing around operators (`=`, `==`, `+`, `-`, etc.)
+- Organize brace placement consistently
+- Clean up blank lines and trailing whitespace
+- Format include statements and namespace declarations
 
 ---
 
@@ -62,6 +93,8 @@ CppLab is a lightweight, browser-based C++ compiler. It takes your code, sends i
 | **Backend** | Node.js + Express |
 | **Compiler** | g++ (C++17) |
 | **UI** | Custom CSS — glassmorphism, animated gradients |
+| **Typography** | Monaco, Menlo, SF Mono, IBM Plex Mono |
+| **Linting** | oxlint (Rust-based ESLint alternative) |
 
 ---
 
@@ -69,13 +102,22 @@ CppLab is a lightweight, browser-based C++ compiler. It takes your code, sends i
 
 **Prerequisites:** Node.js 18+, g++ in PATH
 
+### Installation
+
 ```bash
 git clone https://github.com/your-username/cpp-online-compiler.git
 cd cpp-online-compiler
-npm install && cd client && npm install && cd ..
+
+# Install root dependencies (server)
+npm install
+
+# Install client dependencies
+cd client && npm install && cd ..
 ```
 
-**Run locally (two terminals):**
+### Development
+
+Run both frontend and backend in separate terminals:
 
 ```bash
 # Terminal 1 — Backend (port 5000)
@@ -86,6 +128,13 @@ npm run dev:client
 ```
 
 Open **http://localhost:3000** — the Vite dev server proxies API calls to the backend automatically.
+
+### Production Build
+
+```bash
+npm run build    # Builds client into client/dist
+npm start        # Starts server serving built client
+```
 
 ---
 
@@ -99,10 +148,20 @@ cpp-online-compiler/
 │
 ├── client/                   # React frontend
 │   ├── src/
-│   │   ├── App.jsx           # Main component — editor, I/O, run logic
+│   │   ├── App.jsx           # Main app container
 │   │   ├── App.css           # Glassmorphism UI styles
 │   │   ├── index.css         # CSS variables & reset
-│   │   └── main.jsx          # Entry point
+│   │   ├── main.jsx          # Entry point
+│   │   │
+│   │   ├── components/       # React components
+│   │   │   ├── Header.jsx    # Logo, shortcuts, run button
+│   │   │   ├── Editor.jsx    # Code editor, line numbers, format btn
+│   │   │   ├── Output.jsx    # Output/error tabs
+│   │   │   └── Footer.jsx    # Status bar
+│   │   │
+│   │   └── utils/            # Utility functions
+│   │       └── formatCpp.js  # C++ code formatter
+│   │
 │   ├── index.html
 │   └── vite.config.js        # Dev proxy to backend
 │
@@ -116,12 +175,30 @@ cpp-online-compiler/
 
 ### `POST /compile`
 
+Compiles and executes C++ code.
+
 ```json
 // Request
-{ "code": "#include <iostream>\nusing namespace std;\nint main(){cout<<42;}", "input": "" }
+{
+  "code": "#include <iostream>\nusing namespace std;\nint main(){cout<<42;}",
+  "input": ""
+}
 
-// Response
-{ "output": "42", "error": "", "status": "success", "exitCode": 0, "executionTime": 12 }
+// Response (success)
+{
+  "output": "42",
+  "error": "",
+  "status": "success",
+  "exitCode": 0,
+  "executionTime": 12
+}
+
+// Response (compile error)
+{
+  "output": "",
+  "error": "main.cpp:3:1: error: expected ';' before '}' token",
+  "status": "compile_error"
+}
 ```
 
 | `status` | Meaning |
@@ -137,16 +214,26 @@ Returns `{ "status": "ok", "platform": "linux" }`.
 
 ---
 
-## Safety
+## Safety & Limits
 
-| Limit | Value |
+| Limit | Value | Reason |
+|---|---|---|
+| Max code size | 50 KB | Prevents abuse |
+| Compile timeout | 15s | Catches infinite loops in compilation |
+| Run timeout | 10s | Prevents runaway programs |
+| Max output | 100 KB | Prevents memory exhaustion |
+| Temp files | Auto-cleaned | No persistent storage between requests |
+| Persistent storage | None | Privacy-first design |
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
 |---|---|
-| Max code size | 50 KB |
-| Compile timeout | 15s |
-| Run timeout | 10s |
-| Max output | 100 KB |
-| Temp files | Auto-cleaned per request |
-| Persistent storage | None |
+| `Ctrl+Enter` | Compile and run code |
+| `Shift+Alt+F` | Format code |
+| `Tab` | Insert 4 spaces |
 
 ---
 

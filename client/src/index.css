@@ -10,6 +10,7 @@
   --bg-tertiary: #181828;
   --bg-glass: rgba(16, 16, 26, 0.8);
   --border: rgba(255, 255, 255, 0.06);
+  --border-focus: rgba(124, 106, 240, 0.3);
   --text-primary: #e4e4ec;
   --text-secondary: #8585a0;
   --text-muted: #454560;
@@ -19,7 +20,7 @@
   --accent-soft: rgba(124, 106, 240, 0.06);
   --success: #4ade80;
   --error: #f87171;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-mono: 'Monaco', 'Menlo', 'SF Mono', 'IBM Plex Mono', 'Consolas', monospace;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --radius-sm: 6px;
   --radius-md: 10px;
