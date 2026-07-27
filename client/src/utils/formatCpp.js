@@ -77,8 +77,9 @@ function formatLine(line) {
   // Remove trailing whitespace
   line = line.replace(/\s+$/, "");
 
-  // Normalize spaces around operators (but not inside strings or comments)
-  if (!isInsideString(line)) {
+  // Normalize spaces around operators (but not inside strings, comments, or preprocessor directives)
+  const isPreprocessor = line.startsWith("#");
+  if (!isInsideString(line) && !isPreprocessor) {
     // Spacing around comparison operators
     line = line.replace(/([^!=<>])=(?!=)/g, "$1 = ");
     line = line.replace(/([^<>])=(?!=)/g, "$1 = ");
