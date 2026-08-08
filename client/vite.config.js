@@ -4,6 +4,21 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: './',
+  build: {
+    target: 'esnext',
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react',
+              test: /node_modules\/(react|react-dom)\//,
+            },
+          ],
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
     proxy: {
