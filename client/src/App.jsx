@@ -59,8 +59,13 @@ function App() {
 
   return (
     <div className="app">
-      <div className="bg-glow glow-1" />
-      <div className="bg-glow glow-2" />
+      <div className="bg-aurora aurora-1" />
+      <div className="bg-aurora aurora-2" />
+      <div className="bg-aurora aurora-3" />
+      <div className="bg-grid" />
+      <div className="bg-orb orb-1" />
+      <div className="bg-orb orb-2" />
+      <div className="bg-orb orb-3" />
 
       <Header status={status} onCompile={handleCompile} />
 
